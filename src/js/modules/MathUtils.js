@@ -8,7 +8,7 @@
  * @returns {number} 引数に入れた2点間のユークリッド距離
  */
 export const calculateEuclidDistance = (x1, y1, x2, y2) => {
-  return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+  return Math.hypot(x1 - x2, y1 - y2);
 };
 
 /**
