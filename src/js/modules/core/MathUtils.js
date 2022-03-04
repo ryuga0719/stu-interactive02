@@ -53,3 +53,14 @@ export const degree2Radian = (val) => {
 export const radian2Degree = (val) => {
   return (val * 180) / Math.PI;
 };
+
+/**
+* randomRange
+* 範囲指定でランダム値を生成できる
+* @param {number} min - ランダム値の最小値
+* @param {number} max - ランダム値の最大値(未満)
+* @returns {number} 指定範囲のランダム値
+*/
+export const randomRange = (min, max) => {
+ return (Math.random() * (max - min) ) + min;
+}
