@@ -1,8 +1,11 @@
 import { log } from "./modules/core/Debug";
 log("test", "output");
 import * as THREE from "three";
-import * as dat from "dat.gui";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+
+import Planet from './modules/Planet';
+import {degree2Radian} from './modules/core/MathUtils';
+import Particle from "./modules/Particle";
 
 let camera, scene, renderer;
 
@@ -21,6 +24,9 @@ const createDirectionalLight = (x, y, z) => {
   return directionalLight;
 };
 
+/**
+ * setOrbitControls
+ */
 const setOrbitControls = () => {
   const orbitControls = new OrbitControls(camera, document.body);
 
@@ -33,93 +39,91 @@ const setOrbitControls = () => {
 /**
  * init
  */
-const init = () => {
+const initWebGl = () => {
   const width = window.innerWidth;
   const height = window.innerHeight;
-  // レンダラーを作成
+
+  let degree = 0; // 回転角(degree)
+  let radian = 0; // 回転角(rad)
+
+  // レンダラー
   renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#app"),
   });
   renderer.setSize(width, height);
 
-  // シーンを作成
+  // シーン
   scene = new THREE.Scene();
 
-  // 軸の追加
-  const axes = new THREE.AxesHelper(10000);
-  scene.add(axes);
+  // 軸
+  // const axes = new THREE.AxesHelper(10000);
+  // scene.add(axes);
 
-  // カメラを作成
+  // カメラ
   camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
   camera.position.set(0, 1000, 3000);
 
-  // 球体を作成
-  const geometry = new THREE.SphereGeometry(300, 30, 30);
+  // 地球
+  const earthRadius = 300;
+  const earth = new Planet("src/img/earth3.jpg", earthRadius);
+  scene.add(earth);
 
-  // 画像を読み込む
-  const loader = new THREE.TextureLoader();
-  const texture = loader.load("/src/img/chrome.png");
-  // マテリアルにテクスチャーを設定
-  const material = new THREE.MeshStandardMaterial({
-    map: texture,
-  });
+  // 月
+  const moonRadius = earthRadius / 4;
+  const moon = new Planet("src/img/moon.jpg", moonRadius);
+  moon.position.set(1000, 0, 1000); // 月の初期位置
+  scene.add(moon);
 
-  // const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-
-  // メッシュを作成
-  const mesh = new THREE.Mesh(geometry, material);
-
-  // 3D空間にメッシュを追加
-  scene.add(mesh);
+  // 星
+  const particles = new Particle(5000, 500000);
+  scene.add(particles);
 
   // OrbitControls
   const orbitControls = setOrbitControls();
 
   // 平行光源
-  const directionalLight = createDirectionalLight(1, 1, 1);
-
-  // シーンに追加
+  const directionalLight = createDirectionalLight(5000, 5000, 5000);
   scene.add(directionalLight);
 
-  let controls = new (function () {
-    this.cameraX = 0;
-    this.cameraY = 0;
-    this.cameraZ = 1000;
-  })();
+  // 毎フレーム時に実行
+  const update = () => {
+    // 角度の更新
+    degree += 1;
+    radian = degree2Radian(degree);
 
-  const gui = new dat.GUI();
-  gui.add(controls, "cameraX", 0, 2000);
-  gui.add(controls, "cameraY", 0, 2000);
-  gui.add(controls, "cameraZ", 0, 2000);
+    // 地球のプロパティ更新
+    earth.rotation.y += 0.01;
 
-  tick();
+    // 月のプロパティ更新
+    moon.position.x = 1000 * Math.cos(radian); // X座標
+    moon.position.z = 1000 * Math.sin(radian); // Z座標
+    moon.rotation.y += 0.01;
 
-  // 毎フレーム時に実行されるループイベントです
-  function tick() {
-    // メッシュを回転させる
-    mesh.rotation.y += 0.01;
-    // camera.position.set(controls.cameraX, controls.cameraY, controls.cameraZ);
-
+    // orbitControls
     orbitControls.update();
 
-    // レンダリング
+    // レンダリングの更新
     renderer.render(scene, camera);
 
-    requestAnimationFrame(tick);
-  }
-};
+    requestAnimationFrame(update);
+  };
+
+  update();
+};;
 
 /**
  * resize
  */
 const onResize = () => {
-  const windowWidth = window.innerWidth;
-  const windowHeight = window.innerHeight;
-  camera.aspect = windowWidth / windowHeight;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  camera.aspect = width / height;
   camera.updateProjectionMatrix();
-  renderer.setSize(windowWidth, windowHeight);
+  renderer.setSize(width, height);
 };
 
+
 // ページの読み込みを待つ
-window.addEventListener("DOMContentLoaded", init);
+document.addEventListener("DOMContentLoaded", initWebGl);
 window.addEventListener("resize", onResize, false);
+
