@@ -7,6 +7,10 @@ import Planet from './modules/Planet';
 import {degree2Radian} from './modules/core/MathUtils';
 import Particle from "./modules/Particle";
 
+// import img
+import earthUrl from '../img/earth3.jpg';
+import moonUrl from '../img/moon.jpg';
+
 let camera, scene, renderer;
 
 /**
@@ -65,12 +69,12 @@ const initWebGl = () => {
 
   // 地球
   const earthRadius = 300;
-  const earth = new Planet("src/img/earth3.jpg", earthRadius);
+  const earth = new Planet(earthUrl, earthRadius);
   scene.add(earth);
 
   // 月
   const moonRadius = earthRadius / 4;
-  const moon = new Planet("src/img/moon.jpg", moonRadius);
+  const moon = new Planet(moonUrl, moonRadius);
   moon.position.set(1000, 0, 1000); // 月の初期位置
   scene.add(moon);
 
@@ -97,7 +101,7 @@ const initWebGl = () => {
     // 月のプロパティ更新
     moon.position.x = 1000 * Math.cos(radian); // X座標
     moon.position.z = 1000 * Math.sin(radian); // Z座標
-    moon.rotation.y += 0.01;
+    moon.rotation.y += 0.05;
 
     // orbitControls
     orbitControls.update();

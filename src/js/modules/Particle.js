@@ -29,7 +29,7 @@ export default class Particle extends THREE.Points {
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
     const material = new THREE.PointsMaterial({
-      size: 10,
+      size: 10
     });
     super(geometry, material)
   }
