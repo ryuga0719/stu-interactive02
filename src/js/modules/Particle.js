@@ -8,7 +8,6 @@ export default class Particle extends THREE.Points {
     // 頂点数
     const starsNum = _num;
 
-    // バッファーオブジェクトの生成
     const geometry = new THREE.BufferGeometry();
 
     // 型付配列で頂点座標を設定
